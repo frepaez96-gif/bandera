@@ -1,0 +1,89 @@
+<script setup>
+import { ref } from 'vue'
+import { availableCount, playableCount } from './composables/useSettings'
+import { useFlagGame } from './composables/useFlagGame'
+import StartScreen from './components/StartScreen.vue'
+import GameScreen from './components/GameScreen.vue'
+import ResultScreen from './components/ResultScreen.vue'
+import SettingsModal from './components/SettingsModal.vue'
+
+const {
+  status,
+  questions,
+  currentIndex,
+  current,
+  score,
+  bestScore,
+  isAnswered,
+  isLastQuestion,
+  progress,
+  isNewRecord,
+  totalRounds,
+  start,
+  answer,
+  next,
+  reset,
+} = useFlagGame()
+
+const settingsOpen = ref(false)
+</script>
+
+<template>
+  <div class="app">
+    <main class="app__stage">
+      <div v-if="status === 'idle'" class="app__top">
+        <button
+          type="button"
+          class="settings-btn"
+          aria-haspopup="dialog"
+          @click="settingsOpen = true"
+        >
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span class="settings-btn__label">Ajustes</span>
+        </button>
+      </div>
+
+      <StartScreen
+        v-if="status === 'idle'"
+        :best-score="bestScore"
+        :total-rounds="totalRounds"
+        :country-count="availableCount"
+        @start="start"
+      />
+
+      <GameScreen
+        v-else-if="status === 'playing' && current"
+        :question="current"
+        :current-index="currentIndex"
+        :total-rounds="totalRounds"
+        :score="score"
+        :progress="progress"
+        :is-answered="isAnswered"
+        :is-last-question="isLastQuestion"
+        @answer="answer"
+        @next="next"
+      />
+
+      <ResultScreen
+        v-else-if="status === 'finished'"
+        :questions="questions"
+        :score="score"
+        :total-rounds="totalRounds"
+        :best-score="bestScore"
+        :is-new-record="isNewRecord"
+        @restart="start"
+        @home="reset"
+      />
+    </main>
+
+    <footer class="app__foot">
+      {{ playableCount }} banderas ·
+      <a href="https://flagcdn.com" target="_blank" rel="noopener noreferrer">flagcdn.com</a>
+    </footer>
+
+    <SettingsModal v-if="settingsOpen" @close="settingsOpen = false" />
+  </div>
+</template>

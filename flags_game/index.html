@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080d1a" />
+    <meta
+      name="description"
+      content="Juego para adivinar la bandera: elegí 10, 20, 30 o 40 banderas, filtrá por continente y jugá en modo claro u oscuro."
+    />
+    <title>Adivina la Bandera</title>
+    <script>
+      // Aplica el tema guardado antes del primer pintado para evitar el destello.
+      (function () {
+        try {
+          var stored = JSON.parse(localStorage.getItem('guess-the-flag:settings') || 'null')
+          var saved = stored && stored.theme
+          var theme =
+            saved === 'light' || saved === 'dark'
+              ? saved
+              : window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark'
+          document.documentElement.dataset.theme = theme
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.setAttribute('content', theme === 'dark' ? '#080d1a' : '#eef2fb')
+        } catch (error) {
+          // Sin almacenamiento disponible se usa el tema oscuro por defecto.
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
